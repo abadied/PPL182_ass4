@@ -57,6 +57,7 @@ export const typeofExp = (exp: Parsed | Error, tenv: TEnv): TExp | Error =>
 // Pre-conditions: exps is not empty.
 export const typeofExps = (exps: Exp[], tenv: TEnv): TExp | Error =>
     isEmpty(rest(exps)) ? typeofExp(first(exps), tenv) :
+    isDefineExp(first(exps)) ? isError(typeofDefine(first(exps), tenv)) ? typeofDefine(first(exps), tenv) : typeofExps(rest(exps),makeExtendTEnv([first(exps).var],[first(exps).var.texp],tenv)) :
     isError(typeofExp(first(exps), tenv)) ? typeofExp(first(exps), tenv) :
     typeofExps(rest(exps), tenv);
 
@@ -220,6 +221,7 @@ export const typeofDefine = (exp: DefineExp, tenv: TEnv): TExp | Error => {
 // Typing rule:
 // TODO - write the true definition
 export const typeofProgram = (exp: Program, tenv: TEnv): TExp | Error => {
-    return Error("TODO");
+    const constraint = typeofExps(exp.exps,tenv);
+    return isError (constraint) ? Error("TODO") : constraint;
 };
 
