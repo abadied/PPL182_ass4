@@ -5,7 +5,7 @@
  * with the value or reason from that promise.
  */
 function race(promises) {
-    // TODO
+    return Promise.race(promises);
 }
 
 /*
@@ -15,7 +15,17 @@ function race(promises) {
  * Example: [...flatten([1, [2, [3]], 4, [[5, 6], 7, [[[8]]]]])] => [1, 2, 3, 4, 5, 6, 7, 8]
  */
 function* flatten(array) {
-    // TODO
+    const [first, ...rest] = array;
+  
+  if (first instanceof Array && first.length) {
+    yield* flatten(first);
+  } else {
+    yield first;
+  }
+  
+  if (rest instanceof Array && rest.length) {
+    yield* flatten(rest);
+  }
 }
 
 /*
@@ -26,7 +36,10 @@ function* flatten(array) {
  * numbers, take(interleave(evens(), odds()), 8) => [0, 1, 2, 3, 4, 5, 6, 7]
  */
 function* interleave(g1, g2) {
-    // TODO
+    while(true){
+        yield g1.next();
+        yield g2.next();
+    } 
 }
 
 /*
@@ -35,7 +48,11 @@ function* interleave(g1, g2) {
  * Example: take(cycle([1, 2, 3]), 8) => [1, 2, 3, 1, 2, 3, 1, 2]
  */
 function* cycle(array) {
-    // TODO
+    let i = 0;
+    while(true){
+        yield array[i%array.length];
+        i++;
+    }
 }
 
 /*
@@ -47,7 +64,11 @@ function* cycle(array) {
  * Example: [...chain([['A', 'B'], ['C', 'D']])] => ['A', 'B', 'C', 'D']
  */
 function* chain(arrays) {
-    // TODO
+    let arr = [];
+    for(let i = 0 ; i < arrays.length ; i++){
+        arr = arr.concat(flatten(arrays[i]));
+        yield arr;
+    }
 }
 
 /*
@@ -68,3 +89,20 @@ function take(g, n) {
     }
     return result;
 }
+
+// const promise1 = new Promise(function(resolve, reject) {
+//     setTimeout(resolve, 500, 'one');
+// });
+ 
+// const promise2 = new Promise(function(resolve, reject) {
+//     setTimeout(resolve, 100, 'two');
+// });
+ 
+// race([promise1, promise2]).then(function(value) {
+//   console.log(value);
+//   // Both resolve, but promise2 is faster
+// });
+
+// console.log(take(interleave((x)=> reduce((x) =>  , (x)=> {if(x%2 != 0) return x}), 8));
+// console.log(take(interleave([evens()], odds()), 8));
+console.log([...flatten([1, [2, [3]], 4, [[5, 6], 7, [[[8]]]]])]);
