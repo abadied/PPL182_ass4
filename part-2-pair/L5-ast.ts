@@ -216,6 +216,9 @@ const isPrimitiveOp = (x: string): boolean =>
     x === "symbol?" ||
     x === "string?" ||
     x === "display" ||
+    x === "cons" ||
+    x === "car" ||
+    x === "cdr" ||
     x === "newline";
 
 const parseCompound = (sexps: any[]): Parsed | Error =>

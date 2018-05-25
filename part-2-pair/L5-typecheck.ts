@@ -86,6 +86,9 @@ export const typeofPrim = (p: PrimOp): TExp | Error =>
     (p.op === 'string=?') ? parseTE('(T1 * T2 -> boolean)') :
     (p.op === 'display') ? parseTE('(T -> void)') :
     (p.op === 'newline') ? parseTE('(Empty -> void)') :
+    (p.op === 'cons') ? parseTE('(T1 * T2 -> (Pair T1 T2))') :
+    (p.op === 'car') ? parseTE('(T[] -> T)') :
+    (p.op === 'cdr') ? parseTE('(T[] -> T[])') : //TODO: check list symbol!!!
     Error(`Unknown primitive ${p.op}`);
 
 
@@ -113,7 +116,7 @@ export const typeofIf = (ifExp: IfExp, tenv: TEnv): TExp | Error => {
 // Typing rule:
 // If   type<body>(extend-tenv(x1=t1,...,xn=tn; tenv)) = t
 // then type<lambda (x1:t1,...,xn:tn) : t exp)>(tenv) = (t1 * ... * tn -> t)
-export const typeofProc = (proc: ProcExp, tenv: TEnv): TExp | Error => {
+export const typeofProc = (proc: ProcExp, tenv: TEnv): TExp | Error => {    
     const argsTEs = map((vd) => vd.texp, proc.args);
     const extTEnv = makeExtendTEnv(map((vd) => vd.var, proc.args), argsTEs, tenv);
     const constraint1 = checkEqualType(typeofExps(proc.body, extTEnv), proc.returnTE, proc);
