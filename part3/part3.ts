@@ -37,8 +37,14 @@ function* flatten(array) {
  */
 function* interleave(g1, g2) {
     while(true){
-        yield g1.next().value;
-        yield g2.next().value;
+        let  dic1 = g1.next();
+        let dic2 = g2.next();
+        if (dic1.done && dic2.done) {
+            break;
+        }else{
+            if(!dic1.done) yield dic1.value;
+            if(!dic2.done) yield dic2.value;
+        }
     } 
 }
 
@@ -64,11 +70,15 @@ function* cycle(array) {
  * Example: [...chain([['A', 'B'], ['C', 'D']])] => ['A', 'B', 'C', 'D']
  */
 function* chain(arrays) {
-    let arr = [];
-    for(let i = 0 ; i < arrays.length ; i++){
-        arr = arr.concat(flatten(arrays[i]));
-        yield arr;
+    let tmp_g = flatten(arrays);
+    while(true){
+        const { value, done } = tmp_g.next();
+        if (done) {
+            break;
+        }else
+        yield value;
     }
+
 }
 
 /*
@@ -90,23 +100,24 @@ function take(g, n) {
     return result;
 }
 
-// const promise1 = new Promise(function(resolve, reject) {
-//     setTimeout(resolve, 500, 'one');
-// });
+const promise1 = new Promise(function(resolve, reject) {
+    setTimeout(resolve, 500, 'one');
+});
  
-// const promise2 = new Promise(function(resolve, reject) {
-//     setTimeout(resolve, 100, 'two');
-// });
+const promise2 = new Promise(function(resolve, reject) {
+    setTimeout(resolve, 100, 'two');
+});
  
-// race([promise1, promise2]).then(function(value) {
-//   console.log(value);
-//   // Both resolve, but promise2 is faster
-// });
+race([promise1, promise2]).then(function(value) {
+  console.log(value);
+  // Both resolve, but promise2 is faster
+});
 
 // console.log(take(interleave((x)=> reduce((x) =>  , (x)=> {if(x%2 != 0) return x}), 8));
 console.log(take(interleave(flatten([[1], [[3]], 5]), cycle([2, 4, 6])), 8));
 console.log(take(flatten([1, [2, [3]], 4, [[5, 6], 7, [[[8]]]]]),8 ))
 console.log(take(cycle([1, 2, 3]), 8))
-
+console.log(take(chain([['A', 'B'], ['C', 'D']]),3));
+// console.log([...flatten([1, [2, [3]], 4, [[5, 6], 7, [[[8]]]]])]);
 
 

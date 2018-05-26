@@ -5,14 +5,16 @@ import { map, zip, zipWith } from 'ramda';
 import { isAppExp, isBoolExp, isDefineExp, isEmpty, isIfExp, isLetrecExp, isLetExp, isNumExp,
          isPrimOp, isProcExp, isProgram, isStrExp, isVarRef, parse, unparse,
          AppExp, BoolExp, DefineExp, Exp, IfExp, LetrecExp, LetExp, LitExp, NumExp,
-         Parsed, PrimOp, ProcExp, Program, SetExp, StrExp } from "./L5-ast";
+         Parsed, PrimOp, ProcExp, Program, SetExp, StrExp, isCompoundExp } from "./L5-ast";
 import { applyTEnv, makeEmptyTEnv, makeExtendTEnv, TEnv } from "./TEnv";
 // import { isEmpty, isLetrecExp, isLitExp, isStrExp, BoolExp } from "./L5-ast";
-import { isProcTExp, makeBoolTExp, makeNumTExp, makeProcTExp, makeStrTExp, makeVoidTExp,
+import { isProcTExp, makeBoolTExp, makeNumTExp, makeProcTExp, makeStrTExp, makeVoidTExp,isLitTExp, makeLitTExp,
          parseTE, unparseTExp,
          BoolTExp, NumTExp, ProcTExp, StrTExp, TExp } from "./TExp";
 import { getErrorMessages, hasNoError, isError } from './error';
 import { allT, first, rest, second } from './list';
+import { isLitExp, makeLitExp } from "../part-2-define-program/L5-ast";
+import { inferType } from "../part-2-pair/L5-type-equations";
 
 // Purpose: Check that type expressions are equivalent
 // as part of a fully-annotated type check process of exp.
@@ -49,6 +51,7 @@ export const typeofExp = (exp: Parsed | Error, tenv: TEnv): TExp | Error =>
     isLetrecExp(exp) ? typeofLetrec(exp, tenv) :
     isDefineExp(exp) ? typeofDefine(exp, tenv) :
     isProgram(exp) ? typeofProgram(exp, tenv) :
+    isLitExp(exp) ? typeofLitExp(exp) :
     // Skip isSetExp(exp) isLitExp(exp)
     Error("Unknown type");
 
@@ -74,6 +77,7 @@ const numOpTExp = parseTE('(number * number -> number)');
 const numCompTExp = parseTE('(number * number -> boolean)');
 const boolOpTExp = parseTE('(boolean * boolean -> boolean)');
 const typePredTExp = parseTE('(T -> boolean)');
+const typeLitTExp = parseTE('(T -> literal)');
 
 // Todo: cons, car, cdr
 export const typeofPrim = (p: PrimOp): TExp | Error =>
@@ -82,7 +86,7 @@ export const typeofPrim = (p: PrimOp): TExp | Error =>
     ['>', '<', '='].includes(p.op) ? numCompTExp :
     ['number?', 'boolean?', 'string?', 'symbol?', 'list?'].includes(p.op) ? typePredTExp :
     (p.op === 'not') ? parseTE('(boolean -> boolean)') :
-    (p.op === 'eq?') ? parseTE('(T1 * T2 -> boolean)') :
+    (p.op === 'eq?') ? parseTE('(T1 * T2 -> T1)') :
     (p.op === 'string=?') ? parseTE('(T1 * T2 -> boolean)') :
     (p.op === 'display') ? parseTE('(T -> void)') :
     (p.op === 'newline') ? parseTE('(Empty -> void)') :
@@ -124,6 +128,12 @@ export const typeofProc = (proc: ProcExp, tenv: TEnv): TExp | Error => {
         return constraint1;
     else
         return makeProcTExp(argsTEs, proc.returnTE);
+};
+
+
+export const typeofLitExp = (lexp: LitExp): TExp | Error => { 
+    console.log("hi there!");
+    return makeLitTExp();
 };
 
 // Purpose: compute the type of an app-exp

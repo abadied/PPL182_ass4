@@ -39,9 +39,9 @@ import { first, rest, second } from './list';
 export type TExp =  AtomicTExp | CompoundTExp | TVar;
 export const isTExp = (x: any): x is TExp => isAtomicTExp(x) || isCompoundTExp(x) || isTVar(x);
 
-export type AtomicTExp = NumTExp | BoolTExp | StrTExp | VoidTExp;
+export type AtomicTExp = NumTExp | BoolTExp | StrTExp | VoidTExp | LitTExp;
 export const isAtomicTExp = (x: any): x is AtomicTExp =>
-    isNumTExp(x) || isBoolTExp(x) || isStrTExp(x) || isVoidTExp(x);
+    isNumTExp(x) || isBoolTExp(x) || isStrTExp(x) || isVoidTExp(x) || isLitTExp(x);
 
 export type PairTExp = { tag: "PairTExp"; param_a: TExp; param_b: TExp; };
 export const makePairTExp = (param_a: TExp, param_b: TExp): PairTExp =>
@@ -70,6 +70,10 @@ export const isStrTExp = (x: any): x is StrTExp => x.tag === "StrTExp";
 export type VoidTExp = { tag: "VoidTExp" };
 export const makeVoidTExp = (): VoidTExp => ({tag: "VoidTExp"});
 export const isVoidTExp = (x: any): x is VoidTExp => x.tag === "VoidTExp";
+
+export type LitTExp = { tag: "LitTExp" };
+export const makeLitTExp = (): LitTExp => ({tag: "LitTExp"});
+export const isLitTExp = (x: any): x is LitTExp => x.tag === "LitTExp";
 
 // proc-te(param-tes: list(te), return-te: te)
 export type ProcTExp = { tag: "ProcTExp"; paramTEs: TExp[]; returnTE: TExp; };
@@ -156,6 +160,7 @@ export const parseTExp = (texp: any): TExp | Error =>
     (texp === "boolean") ? makeBoolTExp() :
     (texp === "void") ? makeVoidTExp() :
     (texp === "string") ? makeStrTExp() :
+    (texp === "literal") ? makeLitTExp() :
     isString(texp) ? makeTVar(texp) :
     isArray(texp) ? parseCompoundTExp(texp) :
     Error(`Unexpected TExp - ${texp}`);
@@ -207,6 +212,7 @@ const parseTupleTExp = (texps: any[]): Array<TExp | Error> => {
         return [];
     else {
         const argTEs = splitEvenOdds(texps);
+        // console.log(texps);
         if (hasNoError(argTEs))
             return map(parseTExp, argTEs);
         else
@@ -225,12 +231,13 @@ export const unparseTExp = (te: TExp | Error): string | Error => {
         isError(x) ? x :
         isNumTExp(x) ? 'number' :
         isBoolTExp(x) ? 'boolean' :
+        isLitTExp(x) ? 'literal' :
         isStrTExp(x) ? 'string' :
         isVoidTExp(x) ? 'void' :
         isEmptyTVar(x) ? x.var :
         isTVar(x) ? up(tvarContents(x)) :
         isProcTExp(x) ? [...unparseTuple(x.paramTEs), '->', unparseTExp(x.returnTE)] :
-        isPairTExp(x) ? ["Pair", up(x.param_a), up(x.param_b)] :
+        isPairTExp(x) ? ["Pair", unparseTExp(x.param_a), unparseTExp(x.param_b)] :
         ["never"];
     const unparsed = up(te);
     return isString(unparsed) ? unparsed :

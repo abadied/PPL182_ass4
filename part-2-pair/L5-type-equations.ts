@@ -120,15 +120,15 @@ export const makeEquationFromExp = (exp: A.Exp, pool: Pool): Equation[] =>
 // Example: unparseTExp(inferType(parse('(lambda (f x) (f (f x)))')))
 //          ==> '((T_1 -> T_1) * T_1 -> T_1)'
 export const inferType = (exp: A.Exp): T.TExp => {
-    // console.log(`Infer ${A.unparse(exp)}`)
+    // console.log(`Infer ${A.unparse(exp)}\n`)
     const pool = expToPool(exp);
-    // console.log(`Pool ${JSON.stringify(pool)}`);
+    // console.log(`Pool ${JSON.stringify(pool)}\n`);
     const equations = poolToEquations(pool);
-    // console.log(`Equations ${JSON.stringify(equations)}`);
+    console.log(`Equations ${JSON.stringify(equations)}\n`);
     const sub = solveEquations(equations);
-    // console.log(`Sub ${JSON.stringify(sub)}`);
+    // console.log(`Sub ${JSON.stringify(sub)}\n`);
     const texp = inPool(pool, exp);
-    // console.log(`TExp = ${T.unparseTExp(texp)}`);
+    // console.log(`TExp = ${T.unparseTExp(texp)}\n`);
     if (T.isTVar(texp) && ! isError(sub))
         return S.subGet(sub, texp);
     else
@@ -170,7 +170,7 @@ const solve = (equations: Equation[], sub: S.Sub): S.Sub | Error => {
             (T.isAtomicTExp(eq.left) && T.isAtomicTExp(eq.right) && T.eqAtomicTExp(eq.left, eq.right)) ?
                 solve(rest(equations), sub) :
                 Error(`Equation with non-equal atomic type ${eq}`);
-
+        
     if (A.isEmpty(equations)) return sub;
     const eq = makeEquation(S.applySub(sub, first(equations).left),
                             S.applySub(sub, first(equations).right));
@@ -204,3 +204,6 @@ const splitEquation = (eq: Equation): Equation[] =>
                   R.prepend(eq.left.returnTE, eq.left.paramTEs),
                   R.prepend(eq.right.returnTE, eq.right.paramTEs)) :
     [];
+
+// console.log(A.parse("(cons 1 '())"));
+console.log(inferType(A.parse("(cons 1 '())")));

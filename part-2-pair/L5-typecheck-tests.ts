@@ -96,11 +96,11 @@ import { makeBoolTExp, makeNumTExp, makeProcTExp, makeTVar, makeVoidTExp, parseT
 assert.deepEqual(L5typeof("(quote ())"), "literal");
 */
 // Pair
-// console.log(L5typeof("(cons 1 '())"));
-console.log(L5typeof("(eq? 1 2)"));
 
+// console.log(L5typeof("(cons 1 '())"));
+// console.log(L5typeof("'(5)"));
 // assert.deepEqual(L5typeof("(cons 1 '())"), "(Pair number literal)");
-// assert.deepEqual(L5typeof("(cons 1 1)"), "(Pair number number)");
+assert.deepEqual(L5typeof("(cons 1 1)"), "(Pair number number)");
 // assert.deepEqual(L5typeof("(car (cons 1 1))"), "number");
 // assert.deepEqual(L5typeof("(cdr (cons 1 #t))"), "boolean");
 // assert.deepEqual(L5typeof("(cdr (cons (cons 1 2) (cons 1 2)))"), "(Pair number number)");

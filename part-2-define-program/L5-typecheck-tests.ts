@@ -87,9 +87,9 @@ assert.deepEqual(L5typeof(`(letrec (((odd? : (number -> boolean)) (lambda((n : n
 // define
 assert.deepEqual(L5typeof("(define (foo : number) 5)"), "void");
 
-assert.deepEqual(L5typeof("(define (foo : (number * number -> number)) (lambda((x : number) (y : number)) : number (+ x y)))"),
-                 "void");
-assert.deepEqual(L5typeof("(define (x : (Empty -> number)) (lambda () : number 1))"), "void");
+assert.deepEqual(L5typeof("(L5 (define (foo : (number * number -> number)) (lambda((x : number) (y : number)) : number (+ x y))) (foo 2 2))"),
+                 "number");
+// assert.deepEqual(L5typeof("(define (x : (Empty -> number)) (lambda () : number 1))"), "void");
 
 /*
 // LitExp

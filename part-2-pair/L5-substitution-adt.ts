@@ -1,6 +1,6 @@
 import { curry, map, prop, zipWith } from 'ramda';
 import { isEmpty } from "./L5-ast";
-import { eqTVar, isAtomicTExp, isProcTExp, isTVar, makeProcTExp, unparseTExp, TExp, TVar, isPairTExp } from "./TExp";
+import { eqTVar, isAtomicTExp, isProcTExp, isTVar, makeProcTExp, unparseTExp, TExp, TVar, isPairTExp, makePairTExp } from "./TExp";
 import { getErrorMessages, hasNoError, isError } from "./error";
 import { first, rest } from "./list";
 
@@ -76,6 +76,7 @@ export const applySub = (sub: Sub, te: TExp): TExp =>
     isTVar(te) ? subGet(sub, te) :
     isProcTExp(te) ? makeProcTExp(map(curry(applySub)(sub), te.paramTEs),
                                   applySub(sub, te.returnTE)) :
+    isPairTExp(te) ? makePairTExp(applySub(sub, te.param_a), applySub(sub, te.param_b)):
     te;
 
 // ============================================================
