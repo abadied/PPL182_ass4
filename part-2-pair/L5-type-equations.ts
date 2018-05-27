@@ -111,6 +111,9 @@ export const makeEquationFromExp = (exp: A.Exp, pool: Pool): Equation[] =>
     A.isBoolExp(exp) ? [makeEquation(inPool(pool, exp), T.makeBoolTExp())] :
     // The type of a primitive procedure is given by the primitive.
     A.isPrimOp(exp) ? [makeEquation(inPool(pool, exp), trust(TC.typeofPrim(exp)))] :
+
+    A.isLitExp(exp) ? [makeEquation(inPool(pool,exp), T.makeLitTExp())] :
+
     []; // Error(`makeEquationFromExp: Unsupported exp ${exp}`)
 
 
@@ -124,9 +127,9 @@ export const inferType = (exp: A.Exp): T.TExp => {
     const pool = expToPool(exp);
     // console.log(`Pool ${JSON.stringify(pool)}\n`);
     const equations = poolToEquations(pool);
-    console.log(`Equations ${JSON.stringify(equations)}\n`);
+    // console.log(`Equations ${JSON.stringify(equations)}\n`);
     const sub = solveEquations(equations);
-    // console.log(`Sub ${JSON.stringify(sub)}\n`);
+    //  console.log(`Sub ${JSON.stringify(sub)}\n`);
     const texp = inPool(pool, exp);
     // console.log(`TExp = ${T.unparseTExp(texp)}\n`);
     if (T.isTVar(texp) && ! isError(sub))
@@ -170,10 +173,11 @@ const solve = (equations: Equation[], sub: S.Sub): S.Sub | Error => {
             (T.isAtomicTExp(eq.left) && T.isAtomicTExp(eq.right) && T.eqAtomicTExp(eq.left, eq.right)) ?
                 solve(rest(equations), sub) :
                 Error(`Equation with non-equal atomic type ${eq}`);
-        
     if (A.isEmpty(equations)) return sub;
     const eq = makeEquation(S.applySub(sub, first(equations).left),
                             S.applySub(sub, first(equations).right));
+                            // console.log(eq);
+                            // console.log((T.isCompoundTExp(eq.left) && T.isCompoundTExp(eq.right) && canUnify(eq)));
     return T.isTVar(eq.left) ? solveVarEq(eq.left, eq.right) :
            T.isTVar(eq.right) ? solveVarEq(eq.right, eq.left) :
            bothSidesAtomic(eq) ? handleBothSidesAtomic(eq) :
@@ -185,7 +189,7 @@ const solve = (equations: Equation[], sub: S.Sub): S.Sub | Error => {
 // Signature: canUnify(equation)
 // Purpose: Compare the structure of the type expressions of the equation
 const canUnify = (eq: Equation): boolean =>
-    T.isProcTExp(eq.left) && T.isProcTExp(eq.right) &&
+    (T.isProcTExp(eq.left) && T.isProcTExp(eq.right)) &&
     (eq.left.paramTEs.length === eq.right.paramTEs.length);
 
 // Signature: splitEquation(equation)
@@ -205,5 +209,9 @@ const splitEquation = (eq: Equation): Equation[] =>
                   R.prepend(eq.right.returnTE, eq.right.paramTEs)) :
     [];
 
-// console.log(A.parse("(cons 1 '())"));
-console.log(inferType(A.parse("(cons 1 '())")));
+// // console.log(A.parse("(cons 1 '())"));
+// console.log(inferType(A.parse("(cons (cons 1 1) 2)")));
+console.log(inferType(A.parse("(cdr '(1 2))")));
+
+
+// console.log(inferType(A.parse("(lambda (x) (lambda (y) (+ 1 2))2)")));

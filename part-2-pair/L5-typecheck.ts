@@ -47,6 +47,8 @@ export const typeofExp = (exp: Parsed | Error, tenv: TEnv): TExp | Error =>
     isIfExp(exp) ? typeofIf(exp, tenv) :
     isProcExp(exp) ? typeofProc(exp, tenv) :
     isAppExp(exp) ? typeofApp(exp, tenv) :
+    // isAppExp(exp) ? inferType(exp) :
+    
     isLetExp(exp) ? typeofLet(exp, tenv) :
     isLetrecExp(exp) ? typeofLetrec(exp, tenv) :
     isDefineExp(exp) ? typeofDefine(exp, tenv) :
@@ -86,13 +88,14 @@ export const typeofPrim = (p: PrimOp): TExp | Error =>
     ['>', '<', '='].includes(p.op) ? numCompTExp :
     ['number?', 'boolean?', 'string?', 'symbol?', 'list?'].includes(p.op) ? typePredTExp :
     (p.op === 'not') ? parseTE('(boolean -> boolean)') :
-    (p.op === 'eq?') ? parseTE('(T1 * T2 -> T1)') :
+    (p.op === 'eq?') ? parseTE('(T1 * T2 -> boolean)') :
     (p.op === 'string=?') ? parseTE('(T1 * T2 -> boolean)') :
     (p.op === 'display') ? parseTE('(T -> void)') :
     (p.op === 'newline') ? parseTE('(Empty -> void)') :
     (p.op === 'cons') ? parseTE('(T1 * T2 -> (Pair T1 T2))') :
-    (p.op === 'car') ? parseTE('(T[] -> T)') :
-    (p.op === 'cdr') ? parseTE('(T[] -> T[])') : //TODO: check list symbol!!!
+    (p.op === 'car') ? parseTE('((Pair T1 T2) -> T1)') :
+    (p.op === 'quote') ? parseTE('T -> literal'):
+    (p.op === 'cdr') ? parseTE('((Pair T1 T2) -> T2)') : //TODO: check list symbol!!!
     Error(`Unknown primitive ${p.op}`);
 
 
@@ -132,7 +135,7 @@ export const typeofProc = (proc: ProcExp, tenv: TEnv): TExp | Error => {
 
 
 export const typeofLitExp = (lexp: LitExp): TExp | Error => { 
-    console.log("hi there!");
+    // TODO: fix - doesnt work!!
     return makeLitTExp();
 };
 
