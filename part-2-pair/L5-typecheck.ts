@@ -5,16 +5,17 @@ import { map, zip, zipWith } from 'ramda';
 import { isAppExp, isBoolExp, isDefineExp, isEmpty, isIfExp, isLetrecExp, isLetExp, isNumExp,
          isPrimOp, isProcExp, isProgram, isStrExp, isVarRef, parse, unparse,
          AppExp, BoolExp, DefineExp, Exp, IfExp, LetrecExp, LetExp, LitExp, NumExp,
-         Parsed, PrimOp, ProcExp, Program, SetExp, StrExp, isCompoundExp } from "./L5-ast";
+         Parsed, PrimOp, ProcExp, Program, SetExp, StrExp, isCompoundExp, isArray, parseSexp } from "./L5-ast";
 import { applyTEnv, makeEmptyTEnv, makeExtendTEnv, TEnv } from "./TEnv";
 // import { isEmpty, isLetrecExp, isLitExp, isStrExp, BoolExp } from "./L5-ast";
 import { isProcTExp, makeBoolTExp, makeNumTExp, makeProcTExp, makeStrTExp, makeVoidTExp,isLitTExp, makeLitTExp,
          parseTE, unparseTExp,
-         BoolTExp, NumTExp, ProcTExp, StrTExp, TExp } from "./TExp";
+         BoolTExp, NumTExp, ProcTExp, StrTExp, TExp, makePairTExp } from "./TExp";
 import { getErrorMessages, hasNoError, isError } from './error';
 import { allT, first, rest, second } from './list';
 import { isLitExp, makeLitExp } from "../part-2-define-program/L5-ast";
 import { inferType } from "../part-2-pair/L5-type-equations";
+import { isCompoundSExp, isSymbolSExp } from "../part-2-define-program/L5-value";
 
 // Purpose: Check that type expressions are equivalent
 // as part of a fully-annotated type check process of exp.
@@ -53,7 +54,7 @@ export const typeofExp = (exp: Parsed | Error, tenv: TEnv): TExp | Error =>
     isLetrecExp(exp) ? typeofLetrec(exp, tenv) :
     isDefineExp(exp) ? typeofDefine(exp, tenv) :
     isProgram(exp) ? typeofProgram(exp, tenv) :
-    isLitExp(exp) ? typeofLitExp(exp) :
+    isLitExp(exp) ? typeofLitExp(exp, tenv) :
     // Skip isSetExp(exp) isLitExp(exp)
     Error("Unknown type");
 
@@ -134,8 +135,23 @@ export const typeofProc = (proc: ProcExp, tenv: TEnv): TExp | Error => {
 };
 
 
-export const typeofLitExp = (lexp: LitExp): TExp | Error => { 
+export const typeofLitExp = (lexp: LitExp, tenv: TEnv): TExp | Error => { 
     // TODO: fix - doesnt work!!
+    let val = lexp.val;
+    if(isCompoundSExp(val)){
+        if(val.val.length === 3 && isSymbolSExp(val.val[1])){
+            let sym = val.val[1];
+            let sparam_a = val.val[0];
+            // console.log(unparseSExp(sparam_a));
+            let sparam_b = val.val[2];
+            let param_a = typeofExp(parseSexp(isCompoundSExp(sparam_a) ? sparam_a : sparam_a.toString()), tenv);
+            let param_b = typeofExp(parseSexp(isCompoundSExp(sparam_b) ? sparam_b : sparam_b.toString()), tenv);
+            if(hasNoError([param_a,param_b]))
+                return isSymbolSExp(sym) ? sym.val === '.' ? makePairTExp(makeNumTExp(),makeNumTExp()) : makeLitTExp() : makeLitTExp();
+            else
+                return param_a;
+        }
+    }
     return makeLitTExp();
 };
 

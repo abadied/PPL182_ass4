@@ -211,7 +211,7 @@ const splitEquation = (eq: Equation): Equation[] =>
 
 // // console.log(A.parse("(cons 1 '())"));
 // console.log(inferType(A.parse("(cons (cons 1 1) 2)")));
-console.log(inferType(A.parse("(cdr '(1 2))")));
+console.log(inferType(A.parse("'(1.2)")));
 
 
 // console.log(inferType(A.parse("(lambda (x) (lambda (y) (+ 1 2))2)")));
