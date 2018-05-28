@@ -98,7 +98,7 @@ assert.deepEqual(L5typeof("(quote ())"), "literal");
 // Pair
 
 // console.log(L5typeof("(car (cons 1 2))"));
-console.log(L5typeof("'(#t . 5)"));
+console.log(L5typeof("(car '(1 . 2))"));
 // assert.deepEqual(L5typeof("(cons 1 '())"), "(Pair number literal)");
 // assert.deepEqual(L5typeof("(cons 1 1)"), "(Pair number number)");
 // assert.deepEqual(L5typeof("(car (cons 1 1))"), "number");

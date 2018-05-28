@@ -6,6 +6,7 @@ import * as TC from "./L5-typecheck";
 import * as T from "./TExp";
 import { isError, safeF, trust } from './error';
 import {first, rest} from "./list";
+import { makeEmptyTEnv } from "./TEnv";
 
 // ============================================================n
 // Pool ADT
@@ -112,7 +113,7 @@ export const makeEquationFromExp = (exp: A.Exp, pool: Pool): Equation[] =>
     // The type of a primitive procedure is given by the primitive.
     A.isPrimOp(exp) ? [makeEquation(inPool(pool, exp), trust(TC.typeofPrim(exp)))] :
 
-    A.isLitExp(exp) ? [makeEquation(inPool(pool,exp), T.makeLitTExp())] :
+    A.isLitExp(exp) ? [makeEquation(inPool(pool,exp), trust(TC.typeofLitExp(exp, makeEmptyTEnv())))] :
 
     []; // Error(`makeEquationFromExp: Unsupported exp ${exp}`)
 
@@ -189,8 +190,8 @@ const solve = (equations: Equation[], sub: S.Sub): S.Sub | Error => {
 // Signature: canUnify(equation)
 // Purpose: Compare the structure of the type expressions of the equation
 const canUnify = (eq: Equation): boolean =>
-    (T.isProcTExp(eq.left) && T.isProcTExp(eq.right)) &&
-    (eq.left.paramTEs.length === eq.right.paramTEs.length);
+    ((T.isProcTExp(eq.left) && T.isProcTExp(eq.right)) &&
+    (eq.left.paramTEs.length === eq.right.paramTEs.length)) || (T.isPairTExp(eq.left) && T.isPairTExp(eq.right));
 
 // Signature: splitEquation(equation)
 // Purpose: For an equation with unifyable type expressions,
@@ -207,11 +208,13 @@ const splitEquation = (eq: Equation): Equation[] =>
         R.zipWith(makeEquation,
                   R.prepend(eq.left.returnTE, eq.left.paramTEs),
                   R.prepend(eq.right.returnTE, eq.right.paramTEs)) :
+    (T.isPairTExp(eq.left) && T.isPairTExp(eq.right)) ? 
+        [makeEquation(eq.left.param_a, eq.right.param_a), makeEquation(eq.left.param_b, eq.right.param_b)]:
     [];
 
 // // console.log(A.parse("(cons 1 '())"));
 // console.log(inferType(A.parse("(cons (cons 1 1) 2)")));
-console.log(inferType(A.parse("'(1.2)")));
+console.log(inferType(A.parse("(car (cons 1 2))")));
 
 
 // console.log(inferType(A.parse("(lambda (x) (lambda (y) (+ 1 2))2)")));

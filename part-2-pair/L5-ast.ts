@@ -377,7 +377,7 @@ const unparseVarDecl = (vd: VarDecl): string =>
     `(${vd.var} : ${unparseTExp(vd.texp)})`;
 
 //  number | boolean | string | PrimOp | Closure | SymbolSExp | EmptySExp | CompoundSExp
-const unparseSExp = (s: SExp): string =>
+export const unparseSExp = (s: SExp): string =>
     isEmptySExp(s) ? `()` :
     isSymbolSExp(s) ? s.val :
     isCompoundSExp(s) ? `(${map(unparseSExp, s.val).join(" ")})` :

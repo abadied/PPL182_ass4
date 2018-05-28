@@ -5,7 +5,7 @@ import { map, zip, zipWith } from 'ramda';
 import { isAppExp, isBoolExp, isDefineExp, isEmpty, isIfExp, isLetrecExp, isLetExp, isNumExp,
          isPrimOp, isProcExp, isProgram, isStrExp, isVarRef, parse, unparse,
          AppExp, BoolExp, DefineExp, Exp, IfExp, LetrecExp, LetExp, LitExp, NumExp,
-         Parsed, PrimOp, ProcExp, Program, SetExp, StrExp, isCompoundExp, isArray, parseSexp } from "./L5-ast";
+         Parsed, PrimOp, ProcExp, Program, SetExp, StrExp, isCompoundExp, isArray, parseSexp, unparseSExp } from "./L5-ast";
 import { applyTEnv, makeEmptyTEnv, makeExtendTEnv, TEnv } from "./TEnv";
 // import { isEmpty, isLetrecExp, isLitExp, isStrExp, BoolExp } from "./L5-ast";
 import { isProcTExp, makeBoolTExp, makeNumTExp, makeProcTExp, makeStrTExp, makeVoidTExp,isLitTExp, makeLitTExp,
@@ -142,14 +142,13 @@ export const typeofLitExp = (lexp: LitExp, tenv: TEnv): TExp | Error => {
         if(val.val.length === 3 && isSymbolSExp(val.val[1])){
             let sym = val.val[1];
             let sparam_a = val.val[0];
-            // console.log(unparseSExp(sparam_a));
             let sparam_b = val.val[2];
-            let param_a = typeofExp(parseSexp(isCompoundSExp(sparam_a) ? sparam_a : sparam_a.toString()), tenv);
-            let param_b = typeofExp(parseSexp(isCompoundSExp(sparam_b) ? sparam_b : sparam_b.toString()), tenv);
-            if(hasNoError([param_a,param_b]))
-                return isSymbolSExp(sym) ? sym.val === '.' ? makePairTExp(makeNumTExp(),makeNumTExp()) : makeLitTExp() : makeLitTExp();
+            let param_a = typeofExp(parseSexp(unparseSExp(sparam_a)), tenv);
+            let param_b = typeofExp(parseSexp(unparseSExp(sparam_b)), tenv);
+            if(!isError(param_a) && !isError(param_b))
+                return isSymbolSExp(sym) ? sym.val === '.' ? makePairTExp(param_a, param_b) : makeLitTExp() : makeLitTExp();
             else
-                return param_a;
+                return Error("there is an error in lit exp value");
         }
     }
     return makeLitTExp();
