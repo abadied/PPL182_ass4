@@ -121,10 +121,10 @@ let f = [[1], [8,6,3,4], [[2]]];
 let f1 = [[] , [1,5,6,7], [], [1,3],[]];
 let f2 = [[[2],'ppl'], [true, {vlaue:'bye'}], [[[[[[5]]]]]]];
 
-// assert.deepEqual([...flatten([1, [2, [3]], 4, [[5, 6], 7, [[[8]]]]])], [1,2,3,4,5,6,7,8]);
-// assert.deepEqual([...flatten(f)], [1,8,6,3,4,2]);
-// assert.deepEqual([...flatten(f1)], [1,5,6,7,1,3]);
-// assert.deepEqual([...flatten(f2)], [ 2, 'ppl', true, { vlaue: 'bye' }, 5 ]);
+assert.deepEqual([...flatten([1, [2, [3]], 4, [[5, 6], 7, [[[8]]]]])], [1,2,3,4,5,6,7,8]);
+assert.deepEqual([...flatten(f)], [1,8,6,3,4,2]);
+assert.deepEqual([...flatten(f1)], [1,5,6,7,1,3]);
+assert.deepEqual([...flatten(f2)], [ 2, 'ppl', true, { vlaue: 'bye' }, 5 ]);
 assert.deepEqual(take(flatten(f), 2), [1,8]);
 assert.deepEqual(take(flatten(f1), 5), [1,5,6,7,1]);
 assert.deepEqual(take(flatten(f2), 2), [2,'ppl']);
@@ -187,24 +187,24 @@ assert.deepEqual((take(cycle([[1], 2,3,4,5,6]), 4)), [[1],2,3,4]);
 
 let c1 = [[{ofir:100, adi:100}, true, 'its funny'], [13,17,true,false,'black','white'],[[1,2,3], ['a','b','c'], 
             [{test:'looks OK', amothertest:'still ok'}, true]]];
-// assert.deepEqual([...chain(c1)],[ { ofir: 100, adi: 100 },
-//                                     true,
-//                                     'its funny',
-//                                     13,
-//                                     17,
-//                                     true,
-//                                     false,
-//                                     'black',
-//                                     'white',
-//                                     [ 1, 2, 3 ],
-//                                     [ 'a', 'b', 'c' ],
-//                                     [ { test: 'looks OK', amothertest: 'still ok' }, true ] ] );
+assert.deepEqual([...chain(c1)],[ { ofir: 100, adi: 100 },
+                                    true,
+                                    'its funny',
+                                    13,
+                                    17,
+                                    true,
+                                    false,
+                                    'black',
+                                    'white',
+                                    [ 1, 2, 3 ],
+                                    [ 'a', 'b', 'c' ],
+                                    [ { test: 'looks OK', amothertest: 'still ok' }, true ] ] );
 
 let c2 = [['a','b'], ['c', 'd']];
 assert.deepEqual([...chain(c2)], ['a', 'b', 'c', 'd']);
 
 let c3 = [[], ['a', ['b']], [], ['c', 'd'], []];
-// assert.deepEqual([...chain(c3)], ['a', ['b'],'c', 'd']);
+assert.deepEqual([...chain(c3)], ['a', ['b'],'c', 'd']);
 assert.deepEqual(take(chain(c1), 1), [{ofir:100, adi:100}]);
 assert.deepEqual(take(chain(c2), 2), ['a', 'b']);
 assert.deepEqual(take(chain(c3), 2), ['a', ['b']]);
