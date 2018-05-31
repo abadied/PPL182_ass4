@@ -4,7 +4,7 @@ import { makeDefineExp, makeNumExp, makeProcExp, makeVarDecl, makeVarRef, parse 
 import { typeofExp, L5typeof } from './L5-typecheck';
 import { makeEmptyTEnv, makeExtendTEnv } from './TEnv';
 import { makeBoolTExp, makeNumTExp, makeProcTExp, makeTVar, makeVoidTExp, parseTE, unparseTExp } from './TExp';
-
+import { isError } from './error'
 // parseTE
 assert.deepEqual(parseTE("number"), makeNumTExp());
 assert.deepEqual(parseTE("boolean"), makeBoolTExp());
@@ -89,7 +89,7 @@ assert.deepEqual(L5typeof("(define (foo : number) 5)"), "void");
 
 assert.deepEqual(L5typeof("(L5 (define (foo : (number * number -> number)) (lambda((x : number) (y : number)) : number (+ x y))) (foo 2 2))"),
                  "number");
-// assert.deepEqual(L5typeof("(define (x : (Empty -> number)) (lambda () : number 1))"), "void");
+assert.deepEqual(L5typeof("(define (x : (Empty -> number)) (lambda () : number 1))"), "void");
 
 /*
 // LitExp
@@ -134,3 +134,31 @@ assert.deepEqual(L5typeof("(lambda () : number 1)"), "(Empty -> number)");
 assert.deepEqual(L5typeof(`(define (x : (T1 -> (T1 -> number)))
                              (lambda ((x : T1)) : (T1 -> number)
                                (lambda((y : T1)) : number 5)))`), "void");
+
+
+
+
+// Define Tests 2.1
+assert.deepEqual(L5typeof(`(define (foo : number) 5)`) ,'void');
+assert.deepEqual(isError(L5typeof(`(define (foo : number) (lambda (x y) (+ x y)))`)), true);
+assert.deepEqual(L5typeof(`(define (f : (T1 -> T1))
+                        (lambda ((x : T1)) : T1 x))`), 'void');
+assert.deepEqual(isError(L5typeof(`(define (f : (number -> boolean))
+                      (lambda ((x : boolean)) : number x))`)), true);
+assert.deepEqual(isError(L5typeof(`(define (f : (T1 -> T1))
+                            (lambda ((x : T1)) : T1 (+ x 1)))`)), true);
+
+
+//program checks
+
+//sanity
+assert.deepEqual(L5typeof(`(L5 (+ 1 1))`),'number');
+assert.deepEqual(L5typeof(`(L5 (= 0 1))`),'boolean');
+assert.deepEqual(L5typeof(`(L5 (define (x : number) (+ 1 1)) (* x 3))`),'number');
+assert.deepEqual(L5typeof(`(L5 (define (x : number) (+ 1 1)) (/ x 3))`),'number');
+assert.deepEqual(L5typeof(`(L5 (define (x : number) 1) (lambda ((x : number)) : number x))`),'(number -> number)');
+assert.deepEqual(L5typeof(`(L5 (define (x : number) 1) ((lambda ((x : number)) : number x) x))`),'number');
+assert.deepEqual(L5typeof(`(L5 (define (x : number) (+ 1 1)) (= x 3))`),'boolean');
+
+
+                                

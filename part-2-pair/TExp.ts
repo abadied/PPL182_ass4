@@ -270,7 +270,7 @@ export const unparseTExp = (te: TExp | Error): string | Error => {
 
 type Pair<T1, T2> = {left: T1; right: T2};
 
-const matchTVarsInTE = <T1, T2>(te1: TExp, te2: TExp,
+export const matchTVarsInTE = <T1, T2>(te1: TExp, te2: TExp,
                                 succ: (mapping: Array<Pair<TVar, TVar>>) => T1,
                                 fail: () => T2): T1 | T2 =>
     (isTVar(te1) || isTVar(te2)) ? matchTVarsinTVars(tvarDeref(te1), tvarDeref(te2), succ, fail) :

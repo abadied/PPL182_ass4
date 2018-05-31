@@ -177,8 +177,6 @@ const solve = (equations: Equation[], sub: S.Sub): S.Sub | Error => {
     if (A.isEmpty(equations)) return sub;
     const eq = makeEquation(S.applySub(sub, first(equations).left),
                             S.applySub(sub, first(equations).right));
-                            // console.log(eq);
-                            // console.log((T.isCompoundTExp(eq.left) && T.isCompoundTExp(eq.right) && canUnify(eq)));
     return T.isTVar(eq.left) ? solveVarEq(eq.left, eq.right) :
            T.isTVar(eq.right) ? solveVarEq(eq.right, eq.left) :
            bothSidesAtomic(eq) ? handleBothSidesAtomic(eq) :
@@ -212,9 +210,4 @@ const splitEquation = (eq: Equation): Equation[] =>
         [makeEquation(eq.left.param_a, eq.right.param_a), makeEquation(eq.left.param_b, eq.right.param_b)]:
     [];
 
-// // console.log(A.parse("(cons 1 '())"));
-// console.log(inferType(A.parse("(cons (cons 1 1) 2)")));
-console.log(inferType(A.parse("(car (cons 1 2))")));
 
-
-// console.log(inferType(A.parse("(lambda (x) (lambda (y) (+ 1 2))2)")));
