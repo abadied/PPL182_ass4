@@ -213,3 +213,4 @@ assert.deepEqual(infer(`(lambda ((pair1 : (Pair literal number)) (pair2 : (Pair 
                             pair1)`), '((Pair literal number) * (Pair number literal) -> (Pair literal number))');
 assert.deepEqual(infer(`(lambda ((pair1 : (Pair literal number)) (pair2 : (Pair number literal)))
                           pair2)`), '((Pair literal number) * (Pair number literal) -> (Pair number literal))');
+

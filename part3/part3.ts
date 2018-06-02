@@ -6,7 +6,9 @@ import * as assert from 'assert'
  * with the value or reason from that promise.
  */
 function race(promises) {
-    return Promise.race(promises);
+    return new Promise((res, rej) => {
+        promises.forEach(p => p.then(res).catch(rej));
+      });
 }
 
 /*

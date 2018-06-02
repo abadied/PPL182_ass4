@@ -160,5 +160,7 @@ assert.deepEqual(L5typeof(`(L5 (define (x : number) 1) (lambda ((x : number)) : 
 assert.deepEqual(L5typeof(`(L5 (define (x : number) 1) ((lambda ((x : number)) : number x) x))`),'number');
 assert.deepEqual(L5typeof(`(L5 (define (x : number) (+ 1 1)) (= x 3))`),'boolean');
 
-
+  
+  
+ 
                                 
